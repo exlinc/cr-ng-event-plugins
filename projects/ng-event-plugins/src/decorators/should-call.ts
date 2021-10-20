@@ -1,11 +1,11 @@
-import {NgZone} from '@angular/core';
+import {ɵmarkDirty as markDirty} from '@angular/core';
 import {Predicate} from '../types/predicate';
 
 /**
  * TODO: This will not be needed in Angular 10
  * when libraries are allowed to use Ivy renderer and markDirty becomes stable API
  */
-export function shouldCall<T>(predicate: Predicate<T>): MethodDecorator {
+/* export function shouldCall<T>(predicate: Predicate<T>): MethodDecorator {
     return (_, key, desc: PropertyDescriptor) => {
         const {value} = desc;
 
@@ -23,20 +23,20 @@ export function shouldCall<T>(predicate: Predicate<T>): MethodDecorator {
             });
         };
     };
-}
+} */
 
 /**
  * TODO: Use this in Angular 10
  */
-// export function shouldCall<T extends object>(predicate: Predicate<T>): MethodDecorator {
-//     return (_: Object, _key: string | symbol, desc: PropertyDescriptor) => {
-//         const {value} = desc;
-//
-//         desc.value = function(this: T, ...args: any[]) {
-//             if (predicate.apply(this, args)) {
-//                 value.apply(this, args);
-//                 markDirty(this);
-//             }
-//         };
-//     };
-// }
+export function shouldCall<T extends object>(predicate: Predicate<T>): MethodDecorator {
+    return (_: Object, _key: string | symbol, desc: PropertyDescriptor) => {
+        const {value} = desc;
+
+        desc.value = function (this: T, ...args: any[]) {
+            if (predicate.apply(this, args)) {
+                value.apply(this, args);
+                markDirty(this);
+            }
+        };
+    };
+}
